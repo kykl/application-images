@@ -23,8 +23,8 @@
 
 FROM maven:3.3.3-jdk-8
 
-ENV ZEPPELIN_TAG  v0.5.5
-ENV SPARK_MINOR   1.5
+ENV ZEPPELIN_TAG  v0.6.2
+ENV SPARK_MINOR   2.0
 ENV SPARK_PATCH   1
 ENV SPARK_VER     ${SPARK_MINOR}.${SPARK_PATCH}
 ENV HADOOP_MINOR  2.6
@@ -40,12 +40,12 @@ RUN apt-get update \
   && apt-get install -y net-tools build-essential git wget unzip python python-setuptools python-dev python-numpy libfontconfig
 
 RUN git clone https://github.com/apache/incubator-zeppelin.git --branch ${ZEPPELIN_TAG} /opt/zeppelin
-RUN cd /opt/zeppelin && \
+RUN cd /opt/zeppelin && ./dev/change_scala_version.sh 2.11 && \
   mvn clean package \
     -Pbuild-distr \
     -Pspark-${SPARK_MINOR} -Dspark.version=${SPARK_VER} \
     -Phadoop-${HADOOP_MINOR} -Dhadoop.version=${HADOOP_VER} \
-    -Ppyspark \
+    -Pscala-2.11 \
     -DskipTests && \
   echo "Successfully built Zeppelin"
 
